@@ -37,3 +37,13 @@ async def create_tracker(trackername: str, current: int, total: int):
     new_id = len(trackers)+1
     trackers[f"tracker{new_id}"] = [str(new_id), trackername, current, total]
     return {"message": "Tracker Created!"}
+
+
+# PATCH Functions
+# TEMP function for testing MVP
+@app.patch("/update/{trackername}")
+async def update_trackers(trackername: str, newcurrent: int):
+    global trackers
+    if trackername in trackers:
+        trackers[trackername][2] = newcurrent
+    return {"message": "Tracker Progress Updated!"}
