@@ -8,3 +8,6 @@ __pycache__/
 
 # Ignore editor/project files
 .vscode/
+
+# Ignore notes
+notes
