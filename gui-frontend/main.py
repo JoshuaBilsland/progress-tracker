@@ -1,5 +1,6 @@
-from PyQt6.QtCore import QSize
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QProgressBar
+import os
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QProgressBar, QSizePolicy, QSpacerItem
 
 
 class Main(QMainWindow):
@@ -11,6 +12,8 @@ class Main(QMainWindow):
 
         main_page = QWidget()
         main_page_layout = QVBoxLayout()
+        main_page_layout.setContentsMargins(0, 0, 0, 0)
+        main_page_layout.setSpacing(0)
 
         # Replace with request to backend server
         trackers = {
@@ -18,33 +21,59 @@ class Main(QMainWindow):
             "tracker2": ["2", "Churchill: Walking with Destiny", 0, 982]
         }
 
+        # Heading Label
+        label = QLabel("Progress Tracker App")
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        main_page_layout.addWidget(label)
 
-        self.progress_bar = QProgressBar(self)
-        self.progress_bar.setGeometry(200, 80, 250, 20)
-        self.progress_bar.setStyleSheet("""
-            QProgressBar {
-                border-radius: 10px;
-                background-color: #6197cf;
-                text-align: center;
-                height: 5px;
-                color: #FFFFFF;
-                font-size: 16px;
-                font-weight: bold;
-            }
+        # Store progress bars by tracker_name/key for individual retrieval
+        trackers_container = QWidget()
+        trackers_layout = QVBoxLayout()
+        trackers_layout.setContentsMargins(40, 40, 40, 40)
+        trackers_layout.setSpacing(20)
 
-            QProgressBar::chunk {
-                background-color: #0c6bab;
-                border-radius: 10px
-            }
-                                        """)
-        self.progress_bar.setMinimum(0)
-        self.progress_bar.setMaximum(trackers["tracker1"][3])
-        self.progress_bar.setValue(trackers["tracker1"][2])
-        main_page_layout.addWidget(self.progress_bar)
+        self.progress_bars = {}
+        for tracker_name, tracker_data in trackers.items():
+            tracker_container = QWidget()
+            tracker_layout = QVBoxLayout()
+            tracker_layout.setContentsMargins(0, 0, 0, 0)
+            tracker_layout.setSpacing(15)
+
+            tracker_label = QLabel(f"{tracker_data[1]} - {tracker_data[2]}/{tracker_data[3]}")
+            tracker_label.setObjectName("tracker-label")
+            tracker_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            tracker_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            tracker_layout.addWidget(tracker_label)
+
+            progress_bar = QProgressBar(self)
+            progress_bar.setMinimum(0)
+            progress_bar.setMaximum(tracker_data[3])
+            progress_bar.setValue(tracker_data[2])
+            progress_bar.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            tracker_layout.addWidget(progress_bar)
+
+            tracker_container.setLayout(tracker_layout)
+            trackers_layout.addWidget(tracker_container)
+            trackers_layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
+            self.progress_bars[tracker_name] = progress_bar
+
+        trackers_container.setLayout(trackers_layout)
+        main_page_layout.addWidget(trackers_container)
+
         main_page.setLayout(main_page_layout)
         self.setCentralWidget(main_page)
 
+
+def load_stylesheet(filename):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(script_dir, filename)
+    with open(path) as f:
+        return f.read()
+
+
 app = QApplication([])
+app.setStyleSheet(load_stylesheet("style.qss"))
 main = Main()
 main.show()
 app.exec()
