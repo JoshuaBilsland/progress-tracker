@@ -1,6 +1,9 @@
 # Ignore Python virtual environments
 backend/.venv/
+gui-frontend/.venv
 
+# Ignore environmental variables
+.env
 
 # Ignore Python bytecode
 __pycache__/

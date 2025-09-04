@@ -1,4 +1,6 @@
 import os
+import requests
+from dotenv import load_dotenv
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QProgressBar, QSizePolicy, QSpacerItem
 
@@ -15,11 +17,8 @@ class Main(QMainWindow):
         main_page_layout.setContentsMargins(0, 0, 0, 0)
         main_page_layout.setSpacing(0)
 
-        # Replace with request to backend server
-        trackers = {
-            "tracker1": ["1", "The Oxford History of Britain", 582, 751],
-            "tracker2": ["2", "Churchill: Walking with Destiny", 0, 982]
-        }
+        # Retrieve Trackers From Server
+        trackers = self.get_trackers()
 
         # Heading Label
         label = QLabel("Progress Tracker App")
@@ -64,6 +63,13 @@ class Main(QMainWindow):
         main_page.setLayout(main_page_layout)
         self.setCentralWidget(main_page)
 
+    def get_trackers(self):
+        backend_ip = os.getenv("BACKEND_IP")
+        url = f"http://{backend_ip}:8000/trackers"
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+
 
 def load_stylesheet(filename):
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -72,6 +78,7 @@ def load_stylesheet(filename):
         return f.read()
 
 
+load_dotenv()  # Load environmental variables
 app = QApplication([])
 app.setStyleSheet(load_stylesheet("style.qss"))
 main = Main()
