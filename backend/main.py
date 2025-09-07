@@ -42,8 +42,18 @@ async def create_tracker(trackername: str, current: int, total: int):
 # PATCH Functions
 # TEMP function for testing MVP
 @app.patch("/update/{trackername}")
-async def update_trackers(trackername: str, newcurrent: int):
+async def update_tracker(trackername: str, newcurrent: int):
     global trackers
     if trackername in trackers:
         trackers[trackername][2] = newcurrent
     return {"message": "Tracker Progress Updated!"}
+
+
+# DELETE Functions
+# Temp function for testing MVP
+@app.delete("/delete")
+async def delete_tracker(trackername: str):
+    global trackers
+    if trackername in trackers:
+        del trackers[trackername]
+    return {"message": "Tracker Deleted!"}
